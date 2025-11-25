@@ -20,16 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -61,124 +52,95 @@ class MainActivity : ComponentActivity() {
     private val appWidgetManager by lazy { AppWidgetManager.getInstance(this) }
     private val appWidgetHost by lazy { WidgetHostManager.getHost(this) }
 
-    private val overlayPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (!Settings.canDrawOverlays(this)) {
-            Log.w("MainActivity", "Overlay permission not granted")
-        }
-    }
-
-    private val widgetPickerLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        // Robust handling: extract extras from returned intent (picker will include them)
-        if (result.resultCode == RESULT_OK && result.data != null) {
-            val data = result.data!!
-            val pickedId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
-            val providerComponent = data.getParcelableExtra<ComponentName>(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER)
-
-            // Clear the temp allocated id if we didn't pick it
-            if (pickedId == -1) {
-                if (currentPickerWidgetId != -1) {
-                    // Delete what we allocated earlier just in case
-                    appWidgetHost.deleteAppWidgetId(currentPickerWidgetId)
-                    currentPickerWidgetId = -1
-                }
-                return@registerForActivityResult
+    private val overlayPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (!Settings.canDrawOverlays(this)) {
+                Log.w("MainActivity", "Overlay permission not granted")
             }
+        }
 
-            // If the system returned the provider component, try to use it directly
-            if (providerComponent != null) {
-                val providerInfo = appWidgetManager.getAppWidgetInfo(pickedId)
-                if (providerInfo != null) {
-                    // Normal path
-                    proceedWithWidgetConfig(pickedId, providerInfo)
-                    currentPickerWidgetId = -1
+    /**
+     * WIDGET PICKER
+     */
+    private val widgetPickerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+
+                val data = result.data!!
+                val pickedId = data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+                val providerComponent =
+                    data.getParcelableExtra<ComponentName>(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER)
+
+                if (pickedId == -1) {
+                    if (currentPickerWidgetId != -1) {
+                        appWidgetHost.deleteAppWidgetId(currentPickerWidgetId)
+                        currentPickerWidgetId = -1
+                    }
                     return@registerForActivityResult
                 }
-            }
 
-            // Otherwise, sometimes the provider mapping isn't available instantly.
-            // Try a short retry loop before giving up — this covers the "user hasn't tapped accept immediately" timing case.
-            lifecycleScope.launch {
-                var providerInfo: AppWidgetProviderInfo? = null
-                val maxAttempts = 6
-                repeat(maxAttempts) { attempt ->
-                    providerInfo = appWidgetManager.getAppWidgetInfo(pickedId)
-                    if (providerInfo != null) return@repeat
-                    delay(200L)
-                }
-
-                if (providerInfo != null) {
-                    proceedWithWidgetConfig(pickedId, providerInfo!!)
-                } else {
-                    // Still not available — safe cleanup.
-                    try {
-                        appWidgetHost.deleteAppWidgetId(pickedId)
-                    } catch (t: Throwable) {
-                        Log.w("MainActivity", "Failed to delete appWidgetId $pickedId", t)
+                if (providerComponent != null) {
+                    val providerInfo = appWidgetManager.getAppWidgetInfo(pickedId)
+                    if (providerInfo != null) {
+                        proceedWithWidgetConfig(pickedId, providerInfo)
+                        currentPickerWidgetId = -1
+                        return@registerForActivityResult
                     }
                 }
 
-                currentPickerWidgetId = -1
-            }
+                lifecycleScope.launch {
+                    var providerInfo: AppWidgetProviderInfo? = null
+                    repeat(6) {
+                        providerInfo = appWidgetManager.getAppWidgetInfo(pickedId)
+                        if (providerInfo != null) return@repeat
+                        delay(200L)
+                    }
 
-        } else {
-            // User cancelled; clean up any allocated id
-            if (currentPickerWidgetId != -1) {
-                try {
-                    appWidgetHost.deleteAppWidgetId(currentPickerWidgetId)
-                } catch (t: Throwable) {
-                    Log.w("MainActivity", "Failed to delete appWidgetId $currentPickerWidgetId on cancel", t)
+                    if (providerInfo != null) {
+                        proceedWithWidgetConfig(pickedId, providerInfo!!)
+                    } else {
+                        try {
+                            appWidgetHost.deleteAppWidgetId(pickedId)
+                        } catch (_: Throwable) {}
+                    }
+
+                    currentPickerWidgetId = -1
                 }
-                currentPickerWidgetId = -1
+
+            } else {
+                if (currentPickerWidgetId != -1) {
+                    try {
+                        appWidgetHost.deleteAppWidgetId(currentPickerWidgetId)
+                    } catch (_: Throwable) {}
+                    currentPickerWidgetId = -1
+                }
             }
         }
-    }
 
-    private val widgetBindLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK && pendingWidgetId != -1 && pendingProviderInfo != null) {
-            proceedWithWidgetConfig(pendingWidgetId, pendingProviderInfo!!)
-        } else {
-            if (pendingWidgetId != -1) {
-                try {
-                    appWidgetHost.deleteAppWidgetId(pendingWidgetId)
-                } catch (t: Throwable) {
-                    Log.w("MainActivity", "Failed to delete pendingWidgetId $pendingWidgetId", t)
-                }
-            }
+    /**
+     * CONFIGURATION Activity Launcher
+     */
+    private val widgetConfigLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val widgetId = pendingWidgetId
+            val providerInfo = pendingProviderInfo
+            val slot = currentSlot
+
             pendingWidgetId = -1
             pendingProviderInfo = null
-        }
-    }
 
-    private val widgetConfigLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val widgetId = pendingWidgetId
-        val providerInfo = pendingProviderInfo
-        val slot = currentSlot
-
-        pendingWidgetId = -1
-        pendingProviderInfo = null
-
-        if (result.resultCode == RESULT_OK && widgetId != -1 && providerInfo != null) {
-            lifecycleScope.launch {
-                saveWidgetConfigAndCapture(slot, widgetId, providerInfo)
-            }
-        } else {
-            if (widgetId != -1) {
-                try {
-                    appWidgetHost.deleteAppWidgetId(widgetId)
-                } catch (t: Throwable) {
-                    Log.w("MainActivity", "Failed to delete widgetId $widgetId after config cancel/fail", t)
+            if (result.resultCode == RESULT_OK && widgetId != -1 && providerInfo != null) {
+                lifecycleScope.launch {
+                    saveWidgetConfigAndCapture(slot, widgetId, providerInfo)
+                }
+            } else {
+                if (widgetId != -1) {
+                    try {
+                        appWidgetHost.deleteAppWidgetId(widgetId)
+                    } catch (_: Throwable) {}
                 }
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -220,8 +182,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainScreen() {
-        val configurations by repository.getAllConfigurations()
-            .collectAsState(initial = emptyList())
+        val configurations by repository.getAllConfigurations().collectAsState(initial = emptyList())
 
         Scaffold(
             topBar = {
@@ -234,6 +195,7 @@ class MainActivity : ComponentActivity() {
                 )
             }
         ) { padding ->
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -254,9 +216,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(4) { index ->
                         val slotNumber = index + 1
                         val config = configurations.find { it.slotNumber == slotNumber }
@@ -279,18 +239,12 @@ class MainActivity : ComponentActivity() {
             )
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        "Slot $slotNumber",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Slot $slotNumber", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                     if (config != null) {
                         Text(
@@ -316,9 +270,7 @@ class MainActivity : ComponentActivity() {
                                 removeWidget(slotNumber, config.appWidgetId)
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
-                        )
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                     ) {
                         Text("Remove")
                     }
@@ -329,8 +281,8 @@ class MainActivity : ComponentActivity() {
 
     private fun selectWidgetForSlot(slotNumber: Int) {
         currentSlot = slotNumber
-
         currentPickerWidgetId = appWidgetHost.allocateAppWidgetId()
+
         val pickIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK).apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, currentPickerWidgetId)
         }
@@ -338,45 +290,35 @@ class MainActivity : ComponentActivity() {
         widgetPickerLauncher.launch(pickIntent)
     }
 
-    private fun handleWidgetSelection() {
-        // kept for backward compatibility but not used in the updated picker flow
-        // selection handling is now done in widgetPickerLauncher where extras are read
-    }
-
     private fun proceedWithWidgetConfig(appWidgetId: Int, providerInfo: AppWidgetProviderInfo) {
         pendingWidgetId = appWidgetId
         pendingProviderInfo = providerInfo
 
         if (providerInfo.configure != null) {
-            Log.d("MainActivity", "Widget requires configuration. Launching config activity for widgetId: $appWidgetId")
             val configIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).apply {
                 component = providerInfo.configure
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
             }
             widgetConfigLauncher.launch(configIntent)
         } else {
-            Log.d("MainActivity", "Widget does not require configuration. Proceeding directly for widgetId: $appWidgetId")
-            val slot = currentSlot
-            pendingWidgetId = -1
-            pendingProviderInfo = null
             lifecycleScope.launch {
-                saveWidgetConfigAndCapture(slot, appWidgetId, providerInfo)
+                saveWidgetConfigAndCapture(currentSlot, appWidgetId, providerInfo)
             }
         }
     }
 
+    /**
+     * Save widget configuration + capture snapshot via WidgetMirrorService
+     */
     private suspend fun saveWidgetConfigAndCapture(
         slotNumber: Int,
         appWidgetId: Int,
         providerInfo: AppWidgetProviderInfo
     ) {
         repository.getConfigForSlotSync(slotNumber)?.let { oldConfig ->
-            WidgetMirrorService.unbindWidget(this, oldConfig.appWidgetId)
             try {
                 appWidgetHost.deleteAppWidgetId(oldConfig.appWidgetId)
-            } catch (t: Throwable) {
-                Log.w("MainActivity", "Failed to delete old appWidgetId ${oldConfig.appWidgetId}", t)
-            }
+            } catch (_: Throwable) {}
         }
 
         val config = WidgetConfiguration(
@@ -391,30 +333,17 @@ class MainActivity : ComponentActivity() {
 
         repository.saveConfiguration(config)
 
-        WidgetMirrorService.bindWidget(this, appWidgetId, providerInfo, providerInfo.minWidth, providerInfo.minHeight)
-
-        captureAndSaveWidget(slotNumber)
-
-        WidgetUpdater.updateAllWidgets(this)
-    }
-
-    private suspend fun captureAndSaveWidget(slotNumber: Int) {
-        val config = repository.getConfigForSlotSync(slotNumber) ?: return
-
-        kotlinx.coroutines.delay(500)
-
-        WidgetMirrorService.captureWidgetSnapshot(this, config.appWidgetId)
+        // new: capture via the service
+        (application as FlipCoverWidgetsApp).widgetMirrorService?.captureAndPublish(appWidgetId, slotNumber)
 
         WidgetUpdater.updateAllWidgets(this)
     }
 
     private suspend fun removeWidget(slotNumber: Int, appWidgetId: Int) {
-        WidgetMirrorService.unbindWidget(this, appWidgetId)
         try {
             appWidgetHost.deleteAppWidgetId(appWidgetId)
-        } catch (t: Throwable) {
-            Log.w("MainActivity", "Failed to delete appWidgetId $appWidgetId during remove", t)
-        }
+        } catch (_: Throwable) {}
+
         repository.removeConfiguration(slotNumber)
         WidgetUpdater.updateAllWidgets(this)
     }
