@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FlipCoverWidgets</string>
+    <string name="select_widgets">Select Widgets for Cover Screen</string>
+    <string name="no_widgets_selected">No widgets configured yet</string>
+    <string name="tap_to_select">Tap to select a widget</string>
+    <string name="widget_configured">Widget configured successfully</string>
+    <string name="remove_widget">Remove</string>
+    <string name="refresh_widget">Refresh</string>
+    <string name="slot">Slot %1$d</string>
+    <string name="configure_slot">Configure Slot %1$d</string>
+    <string name="widget_loading">Loading widget...</string>
+</resources>

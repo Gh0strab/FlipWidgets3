@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Samsung Galaxy Z Flip cover screen widget dimensions -->
+    <!-- These are specific pixel values for the Flex Window -->
+    <dimen name="cw_min_w">748px</dimen>
+    <dimen name="cw_min_h">720px</dimen>
+</resources>
