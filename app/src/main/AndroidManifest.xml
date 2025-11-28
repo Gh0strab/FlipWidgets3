@@ -4,6 +4,9 @@
     <uses-permission android:name="android.permission.BIND_APPWIDGET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <queries>
         <intent>
@@ -31,6 +34,11 @@
 
         <activity
             android:name=".ui.WidgetConfigActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FlipCoverWidgets" />
+
+        <activity
+            android:name=".ui.WidgetSelectorActivity"
             android:exported="false"
             android:theme="@style/Theme.FlipCoverWidgets" />
 
@@ -110,10 +118,107 @@
                 android:value="true" />
         </receiver>
 
+        <receiver
+            android:name=".widget.FlipCoverWidgetProvider5"
+            android:enabled="true"
+            android:exported="true"
+            android:label="FlipCoverWidget Slot 5 (2x2)">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/flip_cover_widget_info_slot5" />
+            <meta-data
+                android:name="com.samsung.android.appwidget.provider"
+                android:resource="@xml/samsung_flip_cover_widget_info" />
+            <meta-data
+                android:name="com.samsung.android.sdk.subscreen.widget.support_visibility_callback"
+                android:value="true" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.FlipCoverWidgetProvider6"
+            android:enabled="true"
+            android:exported="true"
+            android:label="FlipCoverWidget Slot 6">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/flip_cover_widget_info_slot6" />
+            <meta-data
+                android:name="com.samsung.android.appwidget.provider"
+                android:resource="@xml/samsung_flip_cover_widget_info" />
+            <meta-data
+                android:name="com.samsung.android.sdk.subscreen.widget.support_visibility_callback"
+                android:value="true" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.FlipCoverWidgetProvider7"
+            android:enabled="true"
+            android:exported="true"
+            android:label="FlipCoverWidget Slot 7">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/flip_cover_widget_info_slot7" />
+            <meta-data
+                android:name="com.samsung.android.appwidget.provider"
+                android:resource="@xml/samsung_flip_cover_widget_info" />
+            <meta-data
+                android:name="com.samsung.android.sdk.subscreen.widget.support_visibility_callback"
+                android:value="true" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.FlipCoverWidgetProvider8"
+            android:enabled="true"
+            android:exported="true"
+            android:label="FlipCoverWidget Slot 8 (Test 2x2)">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/flip_cover_widget_info_slot8" />
+            <meta-data
+                android:name="com.samsung.android.appwidget.provider"
+                android:resource="@xml/samsung_flip_cover_widget_info" />
+            <meta-data
+                android:name="com.samsung.android.sdk.subscreen.widget.support_visibility_callback"
+                android:value="true" />
+        </receiver>
+
         <service
             android:name=".service.WidgetMirrorService"
             android:exported="false"
             android:permission="android.permission.BIND_APPWIDGET" />
+
+        <service
+            android:name=".service.CoverScreenWidgetHostService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <service
+            android:name=".service.WidgetUpdateService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
