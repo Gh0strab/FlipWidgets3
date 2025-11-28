@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/widget_layout"
-    android:minWidth="@dimen/cw_min_w"
-    android:minHeight="@dimen/cw_min_h"
+    android:initialLayout="@layout/widget_layout_slot8"
+    android:minWidth="@dimen/cw_min_w_2x2"
+    android:minHeight="@dimen/cw_min_h_2x2"
     android:minResizeWidth="@dimen/cw_min_resize_w"
     android:minResizeHeight="@dimen/cw_min_resize_h"
     android:resizeMode="horizontal|vertical"
-    android:updatePeriodMillis="0"
+    android:updatePeriodMillis="500"
     android:widgetCategory="keyguard" />

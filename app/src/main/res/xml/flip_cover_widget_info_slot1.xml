@@ -3,6 +3,8 @@
     android:initialLayout="@layout/widget_layout_slot1"
     android:minWidth="@dimen/cw_min_w"
     android:minHeight="@dimen/cw_min_h"
+    android:minResizeWidth="@dimen/cw_min_resize_w"
+    android:minResizeHeight="@dimen/cw_min_resize_h"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
     android:widgetCategory="keyguard" />
