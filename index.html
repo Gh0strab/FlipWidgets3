@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlipCoverWidgets - Android App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6200EE 0%, #3700B3 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #6200EE;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #6200EE;
+            padding-bottom: 10px;
+        }
+        
+        .section h3 {
+            color: #3700B3;
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .feature-card {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #6200EE;
+        }
+        
+        .feature-card h3 {
+            margin-top: 0;
+            font-size: 1.1em;
+        }
+        
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+        }
+        
+        .steps li {
+            counter-increment: step-counter;
+            margin: 20px 0;
+            padding-left: 60px;
+            position: relative;
+        }
+        
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #6200EE;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+        
+        a {
+            color: #6200EE;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 FlipCoverWidgets</h1>
+            <p>Display Android Widgets on Your Samsung Z Flip 7 Cover Screen</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>✨ What is This?</h2>
+                <p>FlipCoverWidgets is an Android app that allows you to place any system widget onto the cover screen of your Samsung Galaxy Z Flip 7. Select your favorite widgets through the app, and they'll appear in Samsung's cover screen settings!</p>
+            </div>
+            
+            <div class="section">
+                <h2>🎯 Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🔍 Widget Discovery</h3>
+                        <p>Browse and select from all available Android widgets on your device</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📺 Cover Screen Support</h3>
+                        <p>Samsung-compatible widgets using Flex Window API</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎰 4 Slots Available</h3>
+                        <p>Configure up to 4 different widgets for your cover screen</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📸 Smart Snapshots</h3>
+                        <p>Captures widget content and displays it beautifully</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🏗️ Building the App</h2>
+                
+                <div class="info">
+                    <strong>Note:</strong> This is an Android project. You'll need to build the APK and install it on your Samsung Z Flip 7.
+                </div>
+                
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li>Android SDK API 34</li>
+                    <li>Java 17+ (already installed in this environment)</li>
+                    <li>Gradle 8.2+ (included)</li>
+                </ul>
+                
+                <h3>Build Commands</h3>
+                <div class="code-block">
+# Build debug APK
+./gradlew assembleDebug
+
+# The APK will be at:
+# app/build/outputs/apk/debug/app-debug.apk
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Important:</strong> Building Android apps on Replit has limitations. For best results, clone this repository to your local machine with Android Studio installed.
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📲 Installation & Usage</h2>
+                
+                <ol class="steps">
+                    <li>
+                        <strong>Build & Install</strong><br>
+                        Build the APK using the commands above, transfer to your Z Flip 7, and install it.
+                    </li>
+                    <li>
+                        <strong>Open the App</strong><br>
+                        Launch FlipCoverWidgets and tap on a slot (1-4) to select a widget from your installed apps.
+                    </li>
+                    <li>
+                        <strong>Configure Widget</strong><br>
+                        Select any system widget. If it requires configuration, you'll be prompted to set it up.
+                    </li>
+                    <li>
+                        <strong>Add to Cover Screen</strong><br>
+                        Go to Settings → Cover screen → Widgets, find "FlipCoverWidget Slot X", and add it.
+                    </li>
+                    <li>
+                        <strong>Enjoy!</strong><br>
+                        Your selected widget will now appear on your Z Flip 7's cover screen.
+                    </li>
+                </ol>
+            </div>
+            
+            <div class="section">
+                <h2>⚙️ How It Works</h2>
+                <p>Since Android doesn't allow directly embedding other apps' widgets, this app uses a clever workaround:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Uses <code>AppWidgetHost</code> to bind selected widgets internally</li>
+                    <li>Captures bitmap snapshots of widget content</li>
+                    <li>Displays those snapshots in Samsung cover screen-compatible widgets</li>
+                    <li>Uses <code>launchDisplayId=1</code> to open apps on the cover screen when tapped</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>⚠️ Limitations</h2>
+                <ul style="margin-left: 20px;">
+                    <li>Widgets are displayed as static bitmap snapshots (not live/interactive)</li>
+                    <li>Updates happen periodically or require manual refresh</li>
+                    <li>Some protected widgets may not be accessible</li>
+                    <li>Requires Samsung Galaxy Z Flip 7 or compatible foldable</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>🛠️ Technical Stack</h2>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Language:</strong> Kotlin</li>
+                    <li><strong>UI:</strong> Jetpack Compose + Material3</li>
+                    <li><strong>Database:</strong> Room</li>
+                    <li><strong>Widget Hosting:</strong> AppWidgetHost API</li>
+                    <li><strong>Samsung Integration:</strong> Flex Window API</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>📁 Project Structure</h2>
+                <div class="code-block">
+app/
+├── src/main/
+│   ├── java/com/flipcoverwidgets/app/
+│   │   ├── data/          # Room database & DAOs
+│   │   ├── widget/        # Widget providers
+│   │   ├── service/       # Widget mirror service
+│   │   └── ui/            # Compose UI
+│   ├── res/               # Resources & layouts
+│   └── AndroidManifest.xml
+├── build.gradle.kts
+└── README.md
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Built with ❤️ for Samsung Galaxy Z Flip users</p>
+            <p>See <a href="README.md">README.md</a> for more details</p>
+        </div>
+    </div>
+</body>
+</html>
