@@ -2,6 +2,15 @@
 <resources>
     <!-- Samsung Galaxy Z Flip cover screen widget dimensions -->
     <!-- These are specific pixel values for the Flex Window -->
+    <!-- 4x4 widget size (slots 1-4) -->
     <dimen name="cw_min_w">748px</dimen>
     <dimen name="cw_min_h">720px</dimen>
+    
+    <!-- 2x2 widget size (slots 6-7) -->
+    <dimen name="cw_min_w_2x2">374px</dimen>
+    <dimen name="cw_min_h_2x2">360px</dimen>
+    
+    <!-- 1x1 minimum resize size (allows smallest widgets) -->
+    <dimen name="cw_min_resize_w">40dp</dimen>
+    <dimen name="cw_min_resize_h">40dp</dimen>
 </resources>
